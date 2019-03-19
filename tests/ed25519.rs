@@ -14,7 +14,7 @@ extern crate bincode;
 extern crate ed25519_dalek;
 extern crate hex;
 extern crate rand;
-extern crate sha2;
+extern crate sha3;
 
 use ed25519_dalek::*;
 
@@ -23,7 +23,7 @@ use hex::FromHex;
 use rand::thread_rng;
 use rand::rngs::ThreadRng;
 
-use sha2::Sha512;
+use sha3::Keccak512;
 
 #[cfg(test)]
 mod vectors {
@@ -95,8 +95,8 @@ mod vectors {
         let keypair: Keypair  = Keypair{ secret: secret, public: public };
         let sig1: Signature = Signature::from_bytes(&sig_bytes[..]).unwrap();
 
-        let mut prehash_for_signing: Sha512 = Sha512::default();
-        let mut prehash_for_verifying: Sha512 = Sha512::default();
+        let mut prehash_for_signing: Keccak512 = Keccak512::default();
+        let mut prehash_for_verifying: Keccak512 = Keccak512::default();
 
         prehash_for_signing.input(&msg_bytes[..]);
         prehash_for_verifying.input(&msg_bytes[..]);
@@ -148,17 +148,17 @@ mod integrations {
         let good: &[u8] = b"test message";
         let bad:  &[u8] = b"wrong message";
 
-        // ugh… there's no `impl Copy for Sha512`… i hope we can all agree these are the same hashes
-        let mut prehashed_good1: Sha512 = Sha512::default();
+        // ugh… there's no `impl Copy for Keccak512`… i hope we can all agree these are the same hashes
+        let mut prehashed_good1: Keccak512 = Keccak512::default();
         prehashed_good1.input(good);
-        let mut prehashed_good2: Sha512 = Sha512::default();
+        let mut prehashed_good2: Keccak512 = Keccak512::default();
         prehashed_good2.input(good);
-        let mut prehashed_good3: Sha512 = Sha512::default();
+        let mut prehashed_good3: Keccak512 = Keccak512::default();
         prehashed_good3.input(good);
 
-        let mut prehashed_bad1: Sha512 = Sha512::default();
+        let mut prehashed_bad1: Keccak512 = Keccak512::default();
         prehashed_bad1.input(bad);
-        let mut prehashed_bad2: Sha512 = Sha512::default();
+        let mut prehashed_bad2: Keccak512 = Keccak512::default();
         prehashed_bad2.input(bad);
 
         let context: &[u8] = b"testing testing 1 2 3";

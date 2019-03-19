@@ -253,7 +253,7 @@ extern crate failure;
 extern crate rand;
 #[cfg(feature = "serde")]
 extern crate serde;
-extern crate sha2;
+extern crate sha3;
 
 mod constants;
 mod ed25519;

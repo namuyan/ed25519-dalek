@@ -22,7 +22,7 @@ use curve25519_dalek::scalar::Scalar;
 use rand::CryptoRng;
 use rand::Rng;
 
-use sha2::Sha512;
+use sha3::Keccak512;
 
 #[cfg(feature = "serde")]
 use serde::de::Error as SerdeError;
@@ -127,7 +127,7 @@ impl SecretKey {
     ///
     /// ```
     /// extern crate rand;
-    /// extern crate sha2;
+    /// extern crate sha3;
     /// extern crate ed25519_dalek;
     ///
     /// # #[cfg(feature = "std")]
@@ -135,7 +135,7 @@ impl SecretKey {
     /// #
     /// use rand::Rng;
     /// use rand::rngs::OsRng;
-    /// use sha2::Sha512;
+    /// use sha3::Keccak512;
     /// use ed25519_dalek::PublicKey;
     /// use ed25519_dalek::SecretKey;
     /// use ed25519_dalek::Signature;
@@ -276,14 +276,14 @@ impl<'a> From<&'a SecretKey> for ExpandedSecretKey {
     ///
     /// ```
     /// # extern crate rand;
-    /// # extern crate sha2;
+    /// # extern crate sha3;
     /// # extern crate ed25519_dalek;
     /// #
     /// # fn main() {
     /// #
     /// use rand::Rng;
     /// use rand::thread_rng;
-    /// use sha2::Sha512;
+    /// use sha3::Keccak512;
     /// use ed25519_dalek::{SecretKey, ExpandedSecretKey};
     ///
     /// let mut csprng = thread_rng();
@@ -292,7 +292,7 @@ impl<'a> From<&'a SecretKey> for ExpandedSecretKey {
     /// # }
     /// ```
     fn from(secret_key: &'a SecretKey) -> ExpandedSecretKey {
-        let mut h: Sha512 = Sha512::default();
+        let mut h: Keccak512 = Keccak512::default();
         let mut hash:  [u8; 64] = [0u8; 64];
         let mut lower: [u8; 32] = [0u8; 32];
         let mut upper: [u8; 32] = [0u8; 32];
@@ -324,15 +324,15 @@ impl ExpandedSecretKey {
     ///
     /// ```
     /// # extern crate rand;
-    /// # extern crate sha2;
+    /// # extern crate sha3;
     /// # extern crate ed25519_dalek;
     /// #
-    /// # #[cfg(all(feature = "sha2", feature = "std"))]
+    /// # #[cfg(all(feature = "sha3", feature = "std"))]
     /// # fn main() {
     /// #
     /// use rand::Rng;
     /// use rand::rngs::OsRng;
-    /// use sha2::Sha512;
+    /// use sha3::Keccak512;
     /// use ed25519_dalek::{SecretKey, ExpandedSecretKey};
     ///
     /// let mut csprng: OsRng = OsRng::new().unwrap();
@@ -343,7 +343,7 @@ impl ExpandedSecretKey {
     /// assert!(&expanded_secret_key_bytes[..] != &[0u8; 64][..]);
     /// # }
     /// #
-    /// # #[cfg(any(not(feature = "sha2"), not(feature = "std")))]
+    /// # #[cfg(any(not(feature = "sha3"), not(feature = "std")))]
     /// # fn main() { }
     /// ```
     #[inline]
@@ -366,12 +366,12 @@ impl ExpandedSecretKey {
     ///
     /// ```
     /// # extern crate rand;
-    /// # extern crate sha2;
+    /// # extern crate sha3;
     /// # extern crate ed25519_dalek;
     /// #
     /// # use ed25519_dalek::{ExpandedSecretKey, SignatureError};
     /// #
-    /// # #[cfg(all(feature = "sha2", feature = "std"))]
+    /// # #[cfg(all(feature = "sha3", feature = "std"))]
     /// # fn do_test() -> Result<ExpandedSecretKey, SignatureError> {
     /// #
     /// use rand::Rng;
@@ -388,13 +388,13 @@ impl ExpandedSecretKey {
     /// # Ok(expanded_secret_key_again)
     /// # }
     /// #
-    /// # #[cfg(all(feature = "sha2", feature = "std"))]
+    /// # #[cfg(all(feature = "sha3", feature = "std"))]
     /// # fn main() {
     /// #     let result = do_test();
     /// #     assert!(result.is_ok());
     /// # }
     /// #
-    /// # #[cfg(any(not(feature = "sha2"), not(feature = "std")))]
+    /// # #[cfg(any(not(feature = "sha3"), not(feature = "std")))]
     /// # fn main() { }
     /// ```
     #[inline]
@@ -420,7 +420,7 @@ impl ExpandedSecretKey {
     /// Sign a message with this `ExpandedSecretKey`.
     #[allow(non_snake_case)]
     pub fn sign(&self, message: &[u8], public_key: &PublicKey) -> Signature {
-        let mut h: Sha512 = Sha512::new();
+        let mut h: Keccak512 = Keccak512::new();
         let R: CompressedEdwardsY;
         let r: Scalar;
         let s: Scalar;
@@ -432,7 +432,7 @@ impl ExpandedSecretKey {
         r = Scalar::from_hash(h);
         R = (&r * &constants::ED25519_BASEPOINT_TABLE).compress();
 
-        h = Sha512::new();
+        h = Keccak512::new();
         h.input(R.as_bytes());
         h.input(public_key.as_bytes());
         h.input(&message);
@@ -471,7 +471,7 @@ impl ExpandedSecretKey {
     where
         D: Digest<OutputSize = U64>,
     {
-        let mut h: Sha512;
+        let mut h: Keccak512;
         let mut prehash: [u8; 64] = [0u8; 64];
         let R: CompressedEdwardsY;
         let r: Scalar;
@@ -499,7 +499,7 @@ impl ExpandedSecretKey {
         //
         // This is a really fucking stupid bandaid, and the damned scheme is
         // still bleeding from malleability, for fuck's sake.
-        h = Sha512::new()
+        h = Keccak512::new()
             .chain(b"SigEd25519 no Ed25519 collisions")
             .chain(&[1]) // Ed25519ph
             .chain(&[ctx_len])
@@ -510,7 +510,7 @@ impl ExpandedSecretKey {
         r = Scalar::from_hash(h);
         R = (&r * &constants::ED25519_BASEPOINT_TABLE).compress();
 
-        h = Sha512::new()
+        h = Keccak512::new()
             .chain(b"SigEd25519 no Ed25519 collisions")
             .chain(&[1]) // Ed25519ph
             .chain(&[ctx_len])

@@ -23,7 +23,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "serde")]
 use serde::{Deserializer, Serializer};
 
-pub use sha2::Sha512;
+pub use sha3::Keccak512;
 
 use curve25519_dalek::digest::generic_array::typenum::U64;
 pub use curve25519_dalek::digest::Digest;
@@ -96,7 +96,7 @@ pub fn verify_batch(
     assert!(signatures.len()  == messages.len(),    ASSERT_MESSAGE);
     assert!(signatures.len()  == public_keys.len(), ASSERT_MESSAGE);
     assert!(public_keys.len() == messages.len(),    ASSERT_MESSAGE);
- 
+
     #[cfg(feature = "alloc")]
     use alloc::vec::Vec;
     #[cfg(feature = "std")]
@@ -124,7 +124,7 @@ pub fn verify_batch(
 
     // Compute H(R || A || M) for each (signature, public_key, message) triplet
     let hrams = (0..signatures.len()).map(|i| {
-        let mut h: Sha512 = Sha512::default();
+        let mut h: Keccak512 = Keccak512::default();
         h.input(signatures[i].R.as_bytes());
         h.input(public_keys[i].as_bytes());
         h.input(&messages[i]);
@@ -242,7 +242,7 @@ impl Keypair {
     /// The caller must also supply a hash function which implements the
     /// `Digest` and `Default` traits, and which returns 512 bits of output.
     /// The standard hash function used for most ed25519 libraries is SHA-512,
-    /// which is available with `use sha2::Sha512` as in the example above.
+    /// which is available with `use sha3::Keccak512` as in the example above.
     /// Other suitable hash functions include Keccak-512 and Blake2b-512.
     pub fn generate<R>(csprng: &mut R) -> Keypair
     where
@@ -285,7 +285,7 @@ impl Keypair {
     ///
     /// use ed25519_dalek::Digest;
     /// use ed25519_dalek::Keypair;
-    /// use ed25519_dalek::Sha512;
+    /// use ed25519_dalek::Keccak512;
     /// use ed25519_dalek::Signature;
     /// use rand::thread_rng;
     ///
@@ -296,7 +296,7 @@ impl Keypair {
     /// let message: &[u8] = b"All I want is to pet all of the dogs.";
     ///
     /// // Create a hash digest object which we'll feed the message into:
-    /// let mut prehashed: Sha512 = Sha512::new();
+    /// let mut prehashed: Keccak512 = Keccak512::new();
     ///
     /// prehashed.input(message);
     /// # }
@@ -333,7 +333,7 @@ impl Keypair {
     /// # use ed25519_dalek::Digest;
     /// # use ed25519_dalek::Keypair;
     /// # use ed25519_dalek::Signature;
-    /// # use ed25519_dalek::Sha512;
+    /// # use ed25519_dalek::Keccak512;
     /// # use rand::thread_rng;
     /// #
     /// # #[cfg(feature = "std")]
@@ -341,7 +341,7 @@ impl Keypair {
     /// # let mut csprng = thread_rng();
     /// # let keypair: Keypair = Keypair::generate(&mut csprng);
     /// # let message: &[u8] = b"All I want is to pet all of the dogs.";
-    /// # let mut prehashed: Sha512 = Sha512::new();
+    /// # let mut prehashed: Keccak512 = Keccak512::new();
     /// # prehashed.input(message);
     /// #
     /// let context: &[u8] = b"Ed25519DalekSignPrehashedDoctest";
@@ -404,7 +404,7 @@ impl Keypair {
     /// use ed25519_dalek::Digest;
     /// use ed25519_dalek::Keypair;
     /// use ed25519_dalek::Signature;
-    /// use ed25519_dalek::Sha512;
+    /// use ed25519_dalek::Keccak512;
     /// use rand::thread_rng;
     ///
     /// # #[cfg(feature = "std")]
@@ -413,15 +413,15 @@ impl Keypair {
     /// let keypair: Keypair = Keypair::generate(&mut csprng);
     /// let message: &[u8] = b"All I want is to pet all of the dogs.";
     ///
-    /// let mut prehashed: Sha512 = Sha512::default();
+    /// let mut prehashed: Keccak512 = Keccak512::default();
     /// prehashed.input(message);
     ///
     /// let context: &[u8] = b"Ed25519DalekSignPrehashedDoctest";
     ///
     /// let sig: Signature = keypair.sign_prehashed(prehashed, Some(context));
     ///
-    /// // The sha2::Sha512 struct doesn't implement Copy, so we'll have to create a new one:
-    /// let mut prehashed_again: Sha512 = Sha512::default();
+    /// // The sha3::Keccak512 struct doesn't implement Copy, so we'll have to create a new one:
+    /// let mut prehashed_again: Keccak512 = Keccak512::default();
     /// prehashed_again.input(message);
     ///
     /// let verified = keypair.public.verify_prehashed(prehashed_again, Some(context), &sig);
