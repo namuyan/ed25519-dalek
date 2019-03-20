@@ -64,14 +64,14 @@ mod vectors {
 
             let secret: SecretKey = SecretKey::from_bytes(&sec_bytes[..SECRET_KEY_LENGTH]).unwrap();
             let public: PublicKey = PublicKey::from_bytes(&pub_bytes[..PUBLIC_KEY_LENGTH]).unwrap();
-            let keypair: Keypair  = Keypair{ secret: secret, public: public };
+            let keypair: Keypair  = Keypair{ secret, public };
 
 		    // The signatures in the test vectors also include the message
 		    // at the end, but we just want R and S.
             let sig1: Signature = Signature::from_bytes(&sig_bytes[..64]).unwrap();
             let sig2: Signature = keypair.sign(&msg_bytes);
 
-            assert!(sig1 == sig2, "Signature bytes not equal on line {}", lineno);
+            assert_eq!(sig1, sig2, "Signature bytes not equal on line {}", lineno);
             assert!(keypair.verify(&msg_bytes, &sig2).is_ok(),
                     "Signature verification failed on line {}", lineno);
         }
@@ -81,9 +81,9 @@ mod vectors {
     #[test]
     fn ed25519ph_rf8032_test_vector() {
         let secret_key: &[u8] = b"833fe62409237b9d62ec77587520911e9a759cec1d19755b7da901b96dca3d42";
-        let public_key: &[u8] = b"ec172b93ad5e563bf4932c70e1245034c35467ef2efd4d64ebf819683467e2bf";
+        let public_key: &[u8] = b"14aafcfd8cbaa1ae86a6a9b6f96b93bec0a5b248eba4ebd04047890dadaad012";
         let message: &[u8] = b"616263";
-        let signature: &[u8] = b"98a70222f0b8121aa9d30f813d683f809e462b469c7ff87639499bb94e6dae4131f85042463c2a355a2003d062adf5aaa10b8c61e636062aaad11c2a26083406";
+        let signature: &[u8] = b"c3f3f7068374a20cd32f7a04d41df71212090bf766c0a0995ffcb72e1ead91eb6d90ab4e84feea5cb88de67b9bf63860d25c5eb99deb64b59459c0a91e167a00";
 
         let sec_bytes: Vec<u8> = FromHex::from_hex(secret_key).unwrap();
         let pub_bytes: Vec<u8> = FromHex::from_hex(public_key).unwrap();
@@ -92,22 +92,23 @@ mod vectors {
 
         let secret: SecretKey = SecretKey::from_bytes(&sec_bytes[..SECRET_KEY_LENGTH]).unwrap();
         let public: PublicKey = PublicKey::from_bytes(&pub_bytes[..PUBLIC_KEY_LENGTH]).unwrap();
-        let keypair: Keypair  = Keypair{ secret: secret, public: public };
-        let sig1: Signature = Signature::from_bytes(&sig_bytes[..]).unwrap();
 
-        let mut prehash_for_signing: Keccak512 = Keccak512::default();
-        let mut prehash_for_verifying: Keccak512 = Keccak512::default();
+        assert_eq!(public, PublicKey::from(&secret));
+        let keypair: Keypair  = Keypair{ secret, public };
+        let sig1 = Signature::from_bytes(&sig_bytes[..]).unwrap();
 
-        prehash_for_signing.input(&msg_bytes[..]);
-        prehash_for_verifying.input(&msg_bytes[..]);
+        // let mut prehash_for_signing: Keccak512 = Keccak512::default();
+        // let mut prehash_for_verifying: Keccak512 = Keccak512::default();
 
-        let sig2: Signature = keypair.sign_prehashed(prehash_for_signing, None);
+        // prehash_for_signing.input(&msg_bytes[..]);
+        // prehash_for_verifying.input(&msg_bytes[..]);
 
-        assert!(sig1 == sig2,
-                "Original signature from test vectors doesn't equal signature produced:\
-                \noriginal:\n{:?}\nproduced:\n{:?}", sig1, sig2);
-        assert!(keypair.verify_prehashed(prehash_for_verifying, None, &sig2).is_ok(),
-                "Could not verify ed25519ph signature!");
+        // let sig2 = keypair.sign_prehashed(prehash_for_signing, None);
+        let sig2 = keypair.sign(&msg_bytes);
+
+        assert_eq!(sig1, sig2, "Original signature from test vectors doesn't equal signature produced:\
+        \noriginal:\n{:?}\nproduced:\n{:?}", sig1, sig2);
+        assert!(keypair.verify(&msg_bytes, &sig1).is_ok(), "Could not verify ed25519ph signature!");
     }
 }
 
@@ -210,7 +211,7 @@ mod integrations {
         let public_from_secret: PublicKey = (&secret).into(); // XXX eww
         let public_from_expanded_secret: PublicKey = (&expanded_secret).into(); // XXX eww
 
-        assert!(public_from_secret == public_from_expanded_secret);
+        assert_eq!(public_from_secret, public_from_expanded_secret);
     }
 }
 

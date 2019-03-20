@@ -297,7 +297,9 @@ impl<'a> From<&'a SecretKey> for ExpandedSecretKey {
         let mut lower: [u8; 32] = [0u8; 32];
         let mut upper: [u8; 32] = [0u8; 32];
 
-        h.input(secret_key.as_bytes());
+        let mut secret_key = secret_key.to_bytes();
+        secret_key.reverse();
+        h.input(secret_key);
         hash.copy_from_slice(h.result().as_slice());
 
         lower.copy_from_slice(&hash[00..32]);

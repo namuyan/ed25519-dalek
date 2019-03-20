@@ -57,7 +57,9 @@ impl<'a> From<&'a SecretKey> for PublicKey {
         let mut hash: [u8; 64] = [0u8; 64];
         let mut digest: [u8; 32] = [0u8; 32];
 
-        h.input(secret_key.as_bytes());
+        let mut secret_key = secret_key.to_bytes();
+        secret_key.reverse();
+        h.input(secret_key);
         hash.copy_from_slice(h.result().as_slice());
 
         digest.copy_from_slice(&hash[..32]);
