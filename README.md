@@ -1,5 +1,4 @@
-# ed25519-dalek [![](https://img.shields.io/crates/v/ed25519-dalek.svg)](https://crates.io/crates/ed25519-dalek) [![](https://docs.rs/ed25519-dalek/badge.svg)](https://docs.rs/ed25519-dalek) [![](https://travis-ci.org/dalek-cryptography/ed25519-dalek.svg?branch=master)](https://travis-ci.org/dalek-cryptography/ed25519-dalek?branch=master)
-
+# ed25519-dalek (NEM implementation)
 Fast and efficient Rust implementation of ed25519 key generation, signing, and
 verification in Rust.
 
@@ -117,8 +116,8 @@ eventually support VXEdDSA in curve25519-dalek.
 To install, add the following to your project's `Cargo.toml`:
 
 ```toml
-[dependencies.ed25519-dalek]
-version = "1"
+[dependencies]
+ed25519-dalek = {git = "https://github.com/namuyan/ed25519-dalek"}
 ```
 
 Then, in your library or executable source, add:
@@ -133,9 +132,8 @@ To cause your application to build `ed25519-dalek` with the nightly feature
 enabled by default, instead do:
 
 ```toml
-[dependencies.ed25519-dalek]
-version = "1"
-features = ["nightly"]
+[dependencies]
+ed25519-dalek = {git = "https://github.com/namuyan/ed25519-dalek", features = ["nightly"]}
 ```
 
 To cause your application to instead build with the nightly feature enabled
@@ -150,9 +148,8 @@ nightly = ["ed25519-dalek/nightly"]
 To enable [serde](https://serde.rs) support, build `ed25519-dalek` with:
 
 ```toml
-[dependencies.ed25519-dalek]
-version = "1"
-features = ["serde"]
+[dependencies]
+ed25519-dalek = {git = "https://github.com/namuyan/ed25519-dalek", features = ["serde"]}
 ```
 
 By default, `ed25519-dalek` builds against `curve25519-dalek`'s `u64_backend`
