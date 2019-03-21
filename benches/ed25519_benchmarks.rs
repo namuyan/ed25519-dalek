@@ -39,7 +39,7 @@ mod ed25519_benches {
         let keypair: Keypair = Keypair::generate(&mut csprng);
         let expanded: ExpandedSecretKey = (&keypair.secret).into();
         let msg: &[u8] = b"";
-        
+
         c.bench_function("Ed25519 signing with an expanded secret key", move |b| {
                          b.iter(| | expanded.sign(msg, &keypair.public))
         });
@@ -50,7 +50,7 @@ mod ed25519_benches {
         let keypair: Keypair = Keypair::generate(&mut csprng);
         let msg: &[u8] = b"";
         let sig: Signature = keypair.sign(msg);
-        
+
         c.bench_function("Ed25519 signature verification", move |b| {
                          b.iter(| | keypair.verify(msg, &sig))
         });
@@ -83,6 +83,27 @@ mod ed25519_benches {
         });
     }
 
+    fn encrypt_decrypt_message(c: &mut Criterion) {
+        let mut csprng: ThreadRng = thread_rng();
+        let raw_msg = b"Cook Robin killed by?".to_vec();
+
+        c.bench_function("Ed25519 encrypt/decrypt",  move |b| {
+            b.iter(| | {
+                let pair0 = Keypair::generate(&mut csprng);
+                let sec0 = ExpandedSecretKey::from(&pair0.secret);
+                let pair1 = Keypair::generate(&mut csprng);
+                let sec1 = ExpandedSecretKey::from(&pair1.secret);
+
+                let mut ecdhe0 = sec0.shared_key(&pair1.public);
+                let ecdhe1 = sec1.shared_key(&pair0.public);
+
+                let enc_msg = ecdhe0.encrypt(&raw_msg);
+                let dec_meg = ecdhe1.decrypt(&enc_msg);
+                dec_meg
+            })
+        });
+    }
+
     criterion_group!{
         name = ed25519_benches;
         config = Criterion::default();
@@ -92,6 +113,7 @@ mod ed25519_benches {
             verify,
             verify_batch_signatures,
             key_generation,
+            encrypt_decrypt_message,
     }
 }
 

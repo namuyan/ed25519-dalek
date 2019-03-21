@@ -16,7 +16,7 @@ use clear_on_drop::clear::Clear;
 use curve25519_dalek::constants;
 use curve25519_dalek::digest::generic_array::typenum::U64;
 use curve25519_dalek::digest::Digest;
-use curve25519_dalek::edwards::CompressedEdwardsY;
+use curve25519_dalek::edwards::{CompressedEdwardsY,EdwardsPoint};
 use curve25519_dalek::scalar::Scalar;
 
 use rand::CryptoRng;
@@ -37,6 +37,7 @@ use crate::constants::*;
 use crate::errors::*;
 use crate::public::*;
 use crate::signature::*;
+use crate::ecdhe::Ecdhe;
 
 /// An EdDSA secret key.
 #[derive(Default)] // we derive Default in order to use the clear() method in Drop
@@ -525,6 +526,19 @@ impl ExpandedSecretKey {
         s = &(&k * &self.key) + &r;
 
         Signature { R, s }
+    }
+
+    #[allow(missing_docs)]
+    #[allow(non_snake_case)]
+    pub fn shared_key(&self, public_key: &PublicKey) -> Ecdhe {
+        let a = self.key;
+        let minus_A = public_key.1;
+        //assert_eq!(minus_A.compress(), public_key.0);
+        //assert_eq!(EdwardsPoint::default(), minus_A);
+
+        let A: EdwardsPoint = a * &(minus_A);
+        let g = A.compress().to_bytes();
+        Ecdhe::from(g)
     }
 }
 

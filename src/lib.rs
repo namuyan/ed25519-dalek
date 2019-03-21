@@ -254,8 +254,11 @@ extern crate rand;
 #[cfg(feature = "serde")]
 extern crate serde;
 extern crate sha3;
+extern crate aes_soft as aes;
+extern crate block_modes;
 
 mod constants;
+mod ecdhe;
 mod ed25519;
 mod errors;
 mod public;

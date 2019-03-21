@@ -110,6 +110,41 @@ mod vectors {
         \noriginal:\n{:?}\nproduced:\n{:?}", sig1, sig2);
         assert!(keypair.verify(&msg_bytes, &sig1).is_ok(), "Could not verify ed25519ph signature!");
     }
+
+    #[test]
+    fn ed25519_encrypt_decrypt() {
+        let secret_key0: &[u8] = b"f8789d9f3e4bfcebd3f6d98d7498d36156c4489e64c9b9447f8df633a2f94f58";
+        let public_key0: &[u8] = b"a912e36343162d50ace7bd331777de1f976f4088d0e9cc494cd8a5dea2e92ee5";
+        let secret_key1: &[u8] = b"b8aa7acfdc110d5dda052de720d817e65448fc38d389825db5b3cbc791c29047";
+        let public_key1: &[u8] = b"f55e6dda7da2bfe0670ffdac73db955e756819a345c14412150819b9fcbb0a5e";
+        let raw_msg: &[u8] = b"Hello world nice man";
+        let enc_msg: &[u8] = b"717291b3b4761c79258059a38a6b98f7\
+        b41b31dd09e1ee4bc4dfd4caf984085019c00a364fd46e5d902add3c6ba6946f\
+        c7e19b9d164ff9d3721a7bac5ff3fa96381fb480aad60eb977f13b1ca490ed52";
+
+        let secret_key0: Vec<u8> = FromHex::from_hex(secret_key0).unwrap();
+        let public_key1: Vec<u8> = FromHex::from_hex(public_key1).unwrap();
+        let enc_msg: Vec<u8> = FromHex::from_hex(enc_msg).unwrap();
+        let raw_msg: Vec<u8> = raw_msg.to_vec();
+
+        let secret_key0 = SecretKey::from_bytes(&secret_key0).unwrap();
+        let secret_key0= ExpandedSecretKey::from(&secret_key0);
+        let public_key1 = PublicKey::from_bytes(&public_key1).unwrap();
+
+        let mut ecdhe0 = secret_key0.shared_key(&public_key1);
+        assert_eq!(raw_msg, ecdhe0.decrypt(&enc_msg), "decrypt message failed.");
+
+        let secret_key1: Vec<u8> = FromHex::from_hex(secret_key1).unwrap();
+        let public_key0: Vec<u8> = FromHex::from_hex(public_key0).unwrap();
+
+        let secret_key1 = SecretKey::from_bytes(&secret_key1).unwrap();
+        let secret_key1= ExpandedSecretKey::from(&secret_key1);
+        let public_key0 = PublicKey::from_bytes(&public_key0).unwrap();
+        let mut ecdhe1 = secret_key1.shared_key(&public_key0);
+
+        let enc_msg2 = ecdhe0.encrypt(&raw_msg);
+        assert_eq!(raw_msg, ecdhe1.decrypt(&enc_msg2), "decrypt message is failed.");
+    }
 }
 
 #[cfg(test)]
