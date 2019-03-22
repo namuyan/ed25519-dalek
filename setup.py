@@ -2,8 +2,12 @@ from setuptools import setup
 from setuptools_rust import Binding, RustExtension
 import os.path
 
-with open('README.md', mode="r", errors='ignore') as f:
-    readme = f.read()
+try:
+    with open('README.md', mode="r") as f:
+        readme = f.read()
+except Exception:
+    with open('README.md', mode="r", encoding='utf8', errors='ignore') as f:
+        readme = f.read()
 
 version = '0.1.0-unknown'
 with open("Cargo.toml", mode="r") as fp:
@@ -18,11 +22,12 @@ with open("Cargo.toml", mode="r") as fp:
 
 setup(
     name="nem-ed25519-rust",
+    url="https://github.com/namuyan/ed25519-dalek",
     long_description=readme,
     long_description_content_type='text/markdown',
     version=version,
     classifiers=[
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: BSD License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Rust",
     ],

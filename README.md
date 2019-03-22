@@ -130,6 +130,7 @@ To use for python:
 
 ```bash
 pip3 install --user git+https://github.com/namuyan/ed25519-dalek
+# import nem_ed25519_rust
 ```
 
 # Features
