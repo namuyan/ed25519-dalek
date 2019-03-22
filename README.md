@@ -126,6 +126,12 @@ Then, in your library or executable source, add:
 extern crate ed25519_dalek;
 ```
 
+To use for python:
+
+```bash
+pip3 install --user git+https://github.com/namuyan/ed25519-dalek
+```
+
 # Features
 
 To cause your application to build `ed25519-dalek` with the nightly feature

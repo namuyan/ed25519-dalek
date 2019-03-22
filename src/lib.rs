@@ -256,6 +256,8 @@ extern crate serde;
 extern crate sha3;
 extern crate aes_soft as aes;
 extern crate block_modes;
+#[cfg(feature = "pylib")]
+extern crate pyo3;
 
 mod constants;
 mod ecdhe;
@@ -264,6 +266,8 @@ mod errors;
 mod public;
 mod secret;
 mod signature;
+#[cfg(feature = "pylib")]
+mod python;
 
 // Export everything public in ed25519.
 pub use crate::ed25519::*;
