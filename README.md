@@ -129,8 +129,29 @@ extern crate ed25519_dalek;
 To use for python:
 
 ```bash
-pip3 install --user git+https://github.com/namuyan/ed25519-dalek
-# import nem_ed25519_rust
+pip3 install --user nem_ed25519_rust
+```
+
+```python
+import nem_ed25519_rust
+ 
+# keypair generation
+sec, pub = nem_ed25519_rust.generate_keypair()
+print("sk", sec.hex())
+print("pk", pub.hex())
+ 
+# message signature
+msg = b"hello world, rust-python combination"
+sig = nem_ed25519_rust.sign(msg, sec)
+print("sig", sig.hex())
+nem_ed25519_rust.verify(msg, sig, pub)
+ 
+# message encryption
+sec_other, pub_other = nem_ed25519_rust.generate_keypair()
+enc = nem_ed25519_rust.encrypt(sec, pub_other, msg)
+print("enc", enc.hex())
+dec = nem_ed25519_rust.decrypt(sec_other, pub, enc)
+print("dec", dec)
 ```
 
 # Features
