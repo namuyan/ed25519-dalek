@@ -150,7 +150,7 @@ nem_ed25519_rust.verify(msg, sig, pub)
 sec_other, pub_other = nem_ed25519_rust.generate_keypair()
 enc = nem_ed25519_rust.encrypt(sec, pub_other, msg)
 print("enc", enc.hex())
-dec = nem_ed25519_rust.decrypt(sec_other, pub, enc)
+dec = nem_ed25519_rust.decrypt(sec_other, pub, enc).unwrap()
 print("dec", dec)
 ```
 

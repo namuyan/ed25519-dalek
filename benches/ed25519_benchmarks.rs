@@ -98,7 +98,7 @@ mod ed25519_benches {
                 let ecdhe1 = sec1.shared_key(&pair0.public);
 
                 let enc_msg = ecdhe0.encrypt(&raw_msg);
-                let dec_meg = ecdhe1.decrypt(&enc_msg);
+                let dec_meg = ecdhe1.decrypt(&enc_msg).unwrap();
                 dec_meg
             })
         });

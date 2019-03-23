@@ -132,7 +132,7 @@ mod vectors {
         let public_key1 = PublicKey::from_bytes(&public_key1).unwrap();
 
         let mut ecdhe0 = secret_key0.shared_key(&public_key1);
-        assert_eq!(raw_msg, ecdhe0.decrypt(&enc_msg), "decrypt message failed.");
+        assert_eq!(raw_msg, ecdhe0.decrypt(&enc_msg).unwrap(), "decrypt message failed.");
 
         let secret_key1: Vec<u8> = FromHex::from_hex(secret_key1).unwrap();
         let public_key0: Vec<u8> = FromHex::from_hex(public_key0).unwrap();
@@ -143,7 +143,7 @@ mod vectors {
         let mut ecdhe1 = secret_key1.shared_key(&public_key0);
 
         let enc_msg2 = ecdhe0.encrypt(&raw_msg);
-        assert_eq!(raw_msg, ecdhe1.decrypt(&enc_msg2), "decrypt message is failed.");
+        assert_eq!(raw_msg, ecdhe1.decrypt(&enc_msg2).unwrap(), "decrypt message is failed.");
     }
 }
 

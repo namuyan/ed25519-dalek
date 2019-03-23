@@ -24,8 +24,10 @@ fn decrypt(_py: Python<'_>, secret: &PyBytes, public: &PyBytes, enc_msg: &PyByte
         Err(err) => return Err(ValueError::py_err(err.to_string()))
     };
     let ecdhe = expand.shared_key(&public);
-    let message = ecdhe.decrypt(enc_msg.as_bytes());
-    Ok(PyObject::from(PyBytes::new(_py, message.as_slice())))
+    match ecdhe.decrypt(enc_msg.as_bytes()) {
+        Ok(message) => Ok(PyObject::from(PyBytes::new(_py, message.as_slice()))),
+        Err(err) => Err(ValueError::py_err(err.to_string()))
+    }
 }
 
 #[pyfunction]

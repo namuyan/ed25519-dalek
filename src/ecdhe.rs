@@ -12,6 +12,7 @@ use block_modes::block_padding::Pkcs7;
 use rand::RngCore;
 use rand::rngs::OsRng;
 use sha3::{Digest, Keccak256};
+use std::string::{ToString, String};
 
 type Aes128Cbc = Cbc<Aes128, Pkcs7>;
 
@@ -53,9 +54,9 @@ impl Ecdhe {
         output
     }
 
-    pub fn decrypt(&self, enc_msg: &[u8]) -> std::vec::Vec<u8> {
+    pub fn decrypt(&self, enc_msg: &[u8]) -> Result<std::vec::Vec<u8>, String> {
         if enc_msg.len() < 48 {
-            return vec![];
+            return Err(String::from("Too short encrypt message"))
         }
         let salt = &enc_msg[..32];
         let iv = &enc_msg[32..48];
@@ -65,7 +66,9 @@ impl Ecdhe {
         let key = Keccak256::digest(&key);
 
         let cipher = Aes128Cbc::new_var(&key[..16], &iv).unwrap();
-        let msg = cipher.decrypt_vec(body).unwrap();
-        msg
+        match cipher.decrypt_vec(body) {
+            Ok(msg ) => return Ok(msg),
+            Err(err) => return Err(err.to_string())
+        };
     }
 }
