@@ -13,7 +13,7 @@ description = "Fast and efficient ed25519 EdDSA key generations, signing, and ve
 exclude = [ ".gitignore", "TESTVECTORS", "res/*" ]
 
 [lib]
-name = "nem_ed25519_rust"
+name = "ed25519_dalek"
 crate-type = ["lib", "cdylib"]
 
 [badges]
