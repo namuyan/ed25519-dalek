@@ -118,9 +118,9 @@ mod vectors {
         let secret_key1: &[u8] = b"b8aa7acfdc110d5dda052de720d817e65448fc38d389825db5b3cbc791c29047";
         let public_key1: &[u8] = b"f55e6dda7da2bfe0670ffdac73db955e756819a345c14412150819b9fcbb0a5e";
         let raw_msg: &[u8] = b"Hello world nice man";
-        let enc_msg: &[u8] = b"717291b3b4761c79258059a38a6b98f7\
-        b41b31dd09e1ee4bc4dfd4caf984085019c00a364fd46e5d902add3c6ba6946f\
-        c7e19b9d164ff9d3721a7bac5ff3fa96381fb480aad60eb977f13b1ca490ed52";
+        let enc_msg: &[u8] = b"1a58df3b8f94e5d2dd396c47e2427dee2f12b61ae819bd633018b693db882127\
+        f16739cdfefa80d263a73f331f658a61ed94dbcf69a7202b\
+        fa18b321923d40fe3997afeeae6cf62882abc55bac0bf462";
 
         let secret_key0: Vec<u8> = FromHex::from_hex(secret_key0).unwrap();
         let public_key1: Vec<u8> = FromHex::from_hex(public_key1).unwrap();
@@ -140,7 +140,7 @@ mod vectors {
         let secret_key1 = SecretKey::from_bytes(&secret_key1).unwrap();
         let secret_key1= ExpandedSecretKey::from(&secret_key1);
         let public_key0 = PublicKey::from_bytes(&public_key0).unwrap();
-        let mut ecdhe1 = secret_key1.shared_key(&public_key0);
+        let ecdhe1 = secret_key1.shared_key(&public_key0);
 
         let enc_msg2 = ecdhe0.encrypt(&raw_msg);
         assert_eq!(raw_msg, ecdhe1.decrypt(&enc_msg2).unwrap(), "decrypt message is failed.");

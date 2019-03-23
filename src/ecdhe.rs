@@ -4,7 +4,7 @@
 // - namuyan <thhjuuATyahoo.co.jp>
 
 
-use crate::aes::Aes128;
+use crate::aes::Aes256;
 
 use block_modes::{BlockMode, Cbc};
 use block_modes::block_padding::Pkcs7;
@@ -14,7 +14,7 @@ use rand::rngs::OsRng;
 use sha3::{Digest, Keccak256};
 use std::string::{ToString, String};
 
-type Aes128Cbc = Cbc<Aes128, Pkcs7>;
+type Aes256Cbc = Cbc<Aes256, Pkcs7>;
 
 #[derive(Debug)]
 pub struct Ecdhe {
@@ -45,7 +45,7 @@ impl Ecdhe {
         let mut iv= [0u8;16];
         self.csprng.fill_bytes(&mut iv);
 
-        let cipher = Aes128Cbc::new_var(&key[..16], &iv).unwrap();
+        let cipher = Aes256Cbc::new_var(&key, &iv).unwrap();
         let body = cipher.encrypt_vec(msg);
         let mut output = vec![];
         output.extend_from_slice(&salt);
@@ -65,10 +65,10 @@ impl Ecdhe {
         let key = self.xor_with_g(salt);
         let key = Keccak256::digest(&key);
 
-        let cipher = Aes128Cbc::new_var(&key[..16], &iv).unwrap();
+        let cipher = Aes256Cbc::new_var(&key, &iv).unwrap();
         match cipher.decrypt_vec(body) {
-            Ok(msg ) => return Ok(msg),
-            Err(err) => return Err(err.to_string())
-        };
+            Ok(msg ) => Ok(msg),
+            Err(err) => Err(err.to_string())
+        }
     }
 }
